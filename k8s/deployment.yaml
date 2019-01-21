@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: grpc-web-server
+  name: grpc-web-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: grpc-web-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        run: grpc-web-server
+    spec:
+      containers:
+      - image: teddyyy/grpc-web-server:latest
+        name: grpc-web-server
+        ports:
+        - containerPort: 9090
+        resources:
+          requests:
+            cpu: 100m
+status: {}

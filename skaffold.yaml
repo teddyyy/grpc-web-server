@@ -1,0 +1,9 @@
+apiVersion: skaffold/v1beta1
+kind: Config
+build:
+  artifacts:
+  - image: teddyyy/grpc-web-server
+deploy:
+  kubectl:
+    manifests:
+      - k8s/*
