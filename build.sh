@@ -1,4 +1,4 @@
 #!/bin/bash
 
-env GOOS=linux go build -o server main.go
+env GOOS=linux go build -o bin/server main.go
 skaffold run

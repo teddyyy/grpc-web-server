@@ -1,3 +1,3 @@
 FROM golang:1.10.1
-ADD server /
+ADD bin/server /
 CMD ["/server"]
