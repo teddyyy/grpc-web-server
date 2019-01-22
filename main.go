@@ -25,7 +25,7 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 
 func main() {
     log.Print("Hello gRPC Web Server...")
-    lis, err := net.Listen("tcp4", port)
+    lis, err := net.Listen("tcp", port)
     if err != nil {
         log.Fatalf("failed to listen: %v", err)
     }
