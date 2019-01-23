@@ -18,7 +18,7 @@ jobs:
       - checkout
       - setup_remote_docker: {docker_layer_caching: true}
       - run:
-          command: apt-get update && apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler
+          command: apt-get -y update && apt-get -y install libprotobuf-dev libprotoc-dev protobuf-compiler
       - run:
           command: mkdir plugin/ && cd plugin/ && git clone https://github.com/grpc/grpc-web && cd grpc-web/ && make install-plugin
       - run:
