@@ -18,6 +18,8 @@ jobs:
       - checkout
       - setup_remote_docker: {docker_layer_caching: true}
       - run:
+          command: apk add --update protobuf
+      - run:
           command: mkdir plugin/ && cd plugin/ && git clone https://github.com/grpc/grpc-web && cd grpc-web/ && make install-plugin
       - run:
           command: go get -u google.golang.org/grpc
