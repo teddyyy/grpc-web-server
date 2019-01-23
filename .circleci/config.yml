@@ -20,7 +20,7 @@ jobs:
       - run:
           command: apt-get -y update && apt-get -y install libprotobuf-dev libprotoc-dev protobuf-compiler
       - run:
-          command: mkdir plugin/ && cd plugin/ && git clone https://github.com/grpc/grpc-web && cd grpc-web/ && make install-plugin
+          command: mkdir plugin/ && cd plugin/ && git clone https://github.com/grpc/grpc-web && cd $GOPATH/github.com/teddyyy/grpc-web-server/plugin/grpc-web/ && make install-plugin
       - run:
           command: go get -u google.golang.org/grpc
       - run:
