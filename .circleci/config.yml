@@ -13,7 +13,7 @@ jobs:
   build:
     docker:
       - image: golang:1.10.1
-    working_directory: /home/circleci/go/src/github.com/teddyyy/grpc-web-server
+    working_directory: $GOPATH/github.com/teddyyy/grpc-web-server
     steps:
       - checkout
       - setup_remote_docker: {docker_layer_caching: true}
@@ -26,7 +26,7 @@ jobs:
       - run:
           command: go get -u github.com/golang/protobuf/protoc-gen-go
       - run:
-          command: cd /home/circleci/go/src/github.com/teddyyy/grpc-web-server && GOOS=linux go build -o bin/server main.go
+          command: cd $GOPATH/github.com/teddyyy/grpc-web-server && GOOS=linux go build -o bin/server main.go
       - persist_to_workspace:
           root: .
           paths:
