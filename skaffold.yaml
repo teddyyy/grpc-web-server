@@ -2,9 +2,7 @@ apiVersion: skaffold/v1alpha2
 kind: Config
 build:
   artifacts:
-    - imageName: grpc-web-server
-      docker:
-        dockerfilePath: ./Dockerfile
+  - imageName: teddyyy/grpc-web-server
 deploy:
   kubectl:
     manifests:
