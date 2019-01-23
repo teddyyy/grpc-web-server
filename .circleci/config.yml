@@ -12,11 +12,32 @@ jobs:
           command: go tool vet main.go
   build:
     docker:
+      - image: golang:1.10.1
+    working_directory: ~/grpc-web-server
+    steps:
+      - checkout
+      - setup_remote_docker: {docker_layer_caching: true}
+      - run:
+          command: cd plugin/ && git clone https://github.com/grpc/grpc-web && cd grpc-web/ && make install-plugin
+      - run:
+          command: go get -u google.golang.org/grpc
+      - run:
+          command: go get -u github.com/golang/protobuf/protoc-gen-go
+      - run:
+          command: cd ~/grpc-web-server && GOOS=linux go build -o bin/server main.go
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  package:
+    docker:
       - image: errordeveloper/skaffold:66cc263ef18f107adce245b8fc622a8ea46385f2
     working_directory: ~/grpc-web-server
     steps:
       - checkout
       - setup_remote_docker: {docker_layer_caching: true}
+      - attach_workspace:
+          at: .
       - run:
           command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
       - run:
@@ -29,12 +50,18 @@ jobs:
 
 workflows:
   version: 2
-  test-and-build:
+  test-and-build-and-package:
     jobs:
       - test
       - build:
           requires:
             - test
+          filters:
+            branches:
+              only: master
+      - package:
+          requires:
+            - build
           filters:
             branches:
               only: master
