@@ -1,0 +1,40 @@
+---
+version: 2
+jobs:
+  test:
+    docker:
+      - image: golang:1.10.1
+    working_directory: ~/grpc-web-server
+    steps:
+      - checkout
+      - setup_remote_docker: {docker_layer_caching: true}
+      - run:
+          command: go tool vet main.go
+  build:
+    docker:
+      - image: errordeveloper/skaffold:66cc263ef18f107adce245b8fc622a8ea46385f2
+    working_directory: ~/grpc-web-server
+    steps:
+      - checkout
+      - setup_remote_docker: {docker_layer_caching: true}
+      - run:
+          command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+      - run:
+          command: |
+            if [[ -z "${CIRCLE_PULL_REQUEST}" ]] ; then
+              skaffold build --profile=prd
+            else
+              echo "Do not run skaffold"
+            fi
+
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
