@@ -13,20 +13,22 @@ jobs:
   build:
     docker:
       - image: golang:1.10.1
-    working_directory: $GOPATH/github.com/teddyyy/grpc-web-server
+    environment:
+      - GOPATH: /home/circleci/go
+    working_directory: /home/circleci/go/src/github.com/teddyyy/grpc-web-server
     steps:
       - checkout
       - setup_remote_docker: {docker_layer_caching: true}
       - run:
           command: apt-get -y update && apt-get -y install libprotobuf-dev libprotoc-dev protobuf-compiler
       - run:
-          command: mkdir plugin/ && cd plugin/ && git clone https://github.com/grpc/grpc-web && cd $GOPATH/github.com/teddyyy/grpc-web-server/plugin/grpc-web/ && make install-plugin
+          command: mkdir plugin/ && cd plugin/ && git clone https://github.com/grpc/grpc-web && cd grpc-web/ && make install-plugin
       - run:
           command: go get -u google.golang.org/grpc
       - run:
           command: go get -u github.com/golang/protobuf/protoc-gen-go
       - run:
-          command: cd $GOPATH/github.com/teddyyy/grpc-web-server && GOOS=linux go build -o bin/server main.go
+          command: cd /home/circleci/go/src/github.com/teddyyy/grpc-web-server && GOOS=linux go build -o bin/server main.go
       - persist_to_workspace:
           root: .
           paths:
