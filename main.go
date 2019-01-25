@@ -32,7 +32,7 @@ func unaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 func main() {
     log.Print("Hello gRPC Web Server...")
-    lis, err := net.Listen("tcp", port)
+    lis, err := net.Listen("tcp4", port)
     if err != nil {
         log.Fatalf("failed to listen: %v", err)
     }
