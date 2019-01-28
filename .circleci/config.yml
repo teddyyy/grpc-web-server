@@ -35,7 +35,7 @@ jobs:
             - .
   package:
     docker:
-      - image: errordeveloper/skaffold:66cc263ef18f107adce245b8fc622a8ea46385f2
+      - image: google/cloud-sdk
     working_directory: ~/grpc-web-server
     steps:
       - checkout
@@ -43,13 +43,20 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+          name: gcloud auth
+          command: |
+            echo ${GCLOUD_SERVICE_KEY} | base64 --decode > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+            gcloud --quiet auth configure-docker
       - run:
+          name: docker build & push
           command: |
             if [[ -z "${CIRCLE_PULL_REQUEST}" ]] ; then
-              skaffold build --profile=prd
+              docker build -t asia.gcr.io/agdc-k8s/grpc-web-server:${CIRCLE_SHA1} .
+              docker tag asia.gcr.io/agdc-k8s/grpc-web-server:${CIRCLE_SHA1} asia.gcr.io/agdc-k8s/grpc-web-server:latest
+              docker push asia.gcr.io/agdc-k8s/grpc-web-server
             else
-              echo "Do not run skaffold"
+              echo "Do not run docker"
             fi
 
 workflows:

@@ -1,3 +1,4 @@
+---
 apiVersion: skaffold/v1alpha2
 kind: Config
 build:
@@ -7,14 +8,3 @@ deploy:
   kubectl:
     manifests:
       - k8s/*
-
-profiles:
-  - name: prd
-    ## This profile runs unit tests and builds the image
-    build:
-      local: {skipPush: false}
-      artifacts:
-        - imageName: teddyyy/grpc-web-server
-          docker:
-            dockerfilePath: ./Dockerfile
-    deploy: {}  # not needed here as such
