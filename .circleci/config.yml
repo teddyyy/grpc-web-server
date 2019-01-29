@@ -48,6 +48,11 @@ jobs:
             echo ${GCLOUD_SERVICE_KEY} | base64 --decode > ${HOME}/gcloud-service-key.json
             gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
             gcloud --quiet auth configure-docker
+            gcloud config set project agdc-k8s
+            gcloud --quiet config set container/cluster agop-k8s
+            gcloud config set compute/zone asia-northeast1
+            gcloud --quiet container clusters get-credentials agop-k8s
+            gcloud config set container/use_client_certificate True
       - run:
           name: docker build & push
           command: |
@@ -58,6 +63,13 @@ jobs:
             else
               echo "Do not run docker"
             fi
+      - run:
+          name: deploy to k8s cluster
+          command: |
+            kubectl apply -f k8s/deployment.yaml
+            kubectl apply -f k8s/hpa.yaml
+            kubectl apply -f k8s/service.yaml
+            kubectl patch deployment grpc-web-server -p "{\"spec\": {\"template\": {\"metadata\": {\"labels\": {\"date\": \"$(date +'%s')\" }}}}}"
 
 workflows:
   version: 2
