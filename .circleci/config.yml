@@ -66,9 +66,7 @@ jobs:
       - run:
           name: deploy to k8s cluster
           command: |
-            kubectl apply -f k8s/deployment.yaml
-            kubectl apply -f k8s/hpa.yaml
-            kubectl apply -f k8s/service.yaml
+            kubectl apply -f k8s/dev/
             kubectl patch deployment grpc-web-server -p "{\"spec\": {\"template\": {\"metadata\": {\"labels\": {\"date\": \"$(date +'%s')\" }}}}}"
 
 workflows:

@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: grpc-web-server
+  name: grpc-web-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: grpc-web-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        run: grpc-web-server
+    spec:
+      containers:
+      - image: asia.gcr.io/agdc-k8s/grpc-web-server:latest
+        name: grpc-web-server
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9090
+status: {}

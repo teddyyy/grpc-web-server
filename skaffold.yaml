@@ -2,9 +2,10 @@
 apiVersion: skaffold/v1alpha2
 kind: Config
 build:
+  local: { skipPush: true }
   artifacts:
-  - imageName: teddyyy/grpc-web-server
+  - imageName: asia.gcr.io/agdc-k8s/grpc-web-server
 deploy:
   kubectl:
     manifests:
-      - k8s/*
+      - k8s/local/*
