@@ -22,13 +22,21 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
     return &pb.HelloReply{Message: "Hello " + in.Name}, nil
 }
 
+func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+    res, err := handler(ctx, req)
+	log.Printf("%s: %v -> %v", info.FullMethod, req, res)
+	return res, err
+}
+
 func main() {
     log.Print("Hello gRPC Web Server...")
-    lis, err := net.Listen("tcp4", port)
+    lis, err := net.Listen("tcp", port)
     if err != nil {
         log.Fatalf("failed to listen: %v", err)
     }
-    s := grpc.NewServer()
+    s := grpc.NewServer(
+        grpc.UnaryInterceptor(loggingInterceptor),
+    )
 
     pb.RegisterGreeterServer(s, &server{})
     // Register reflection service on gRPC server.
