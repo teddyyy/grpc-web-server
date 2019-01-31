@@ -16,7 +16,7 @@ spec:
         run: grpc-web-server
     spec:
       containers:
-      - image: asia.gcr.io/agdc-k8s/grpc-web-server:e78738caf8581cef70f12de22742ee5ca4a1d854
+      - image: asia.gcr.io/agdc-k8s/grpc-web-server:1d79746e2a202d4ec1b7c88fd53a11f45cf148b8
         name: grpc-web-server
         ports:
         - containerPort: 9090
