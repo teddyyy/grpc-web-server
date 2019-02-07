@@ -4,6 +4,7 @@ import (
     pb "github.com/teddyyy/grpc-web-server/helloworld"
     "log"
     "net"
+    "os"
 
     "golang.org/x/net/context"
     "google.golang.org/grpc"
@@ -19,7 +20,15 @@ type server struct{}
 
 // SayHello implements helloworld.GreeterServer
 func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-    return &pb.HelloReply{Message: "Hello " + in.Name}, nil
+    if os.Getenv("REGION") == "" {
+        os.Setenv("REGION", "???")
+    }
+    var region = os.Getenv("REGION")
+
+    return &pb.HelloReply{
+        Message: "Hello " + in.Name,
+        Region: region,
+    }, nil
 }
 
 func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
