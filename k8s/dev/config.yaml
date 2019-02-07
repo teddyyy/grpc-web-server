@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grpc-web-server-config
+data:
+  REGION: ap-northeast-1
