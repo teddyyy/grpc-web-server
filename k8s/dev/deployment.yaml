@@ -19,9 +19,6 @@ spec:
       - image: asia.gcr.io/agdc-k8s/grpc-web-server:latest
         name: grpc-web-server
         imagePullPolicy: Always
-        envFrom:
-        - configMapRef:
-            name: grpc-web-server-config
         ports:
         - containerPort: 9090
 status: {}
