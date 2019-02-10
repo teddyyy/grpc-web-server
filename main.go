@@ -26,7 +26,16 @@ type server struct{}
 
 // SayHello implements helloworld.GreeterServer
 func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	region, _ := getRegionFromMetadata()
+	var region string
+	env := os.Getenv("ENV")
+
+	if len(env) == 0 {
+		region, _ = getRegionFromMetadata()
+	} else if env == "local" {
+		region = "localhost"
+	} else {
+		region, _ = getRegionFromMetadata()
+	}
 
 	return &pb.HelloReply{
 		Message: "Hello " + in.Name,

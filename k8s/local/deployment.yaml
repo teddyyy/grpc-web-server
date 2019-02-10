@@ -18,6 +18,9 @@ spec:
       containers:
       - image: asia.gcr.io/agdc-k8s/grpc-web-server
         name: grpc-web-server
+        envFrom:
+        - configMapRef:
+            name: grpc-web-server-config
         ports:
         - containerPort: 9090
         resources:
