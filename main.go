@@ -8,12 +8,15 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"database/sql"
+	"time"
 
 	pb "github.com/teddyyy/grpc-web-server/helloworld"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
@@ -22,7 +25,19 @@ const (
 )
 
 // server is used to implement helloworld.GreeterServer.
-type server struct{}
+type server struct{
+	db *sql.DB
+}
+
+func executeDB(db *sql.DB, name string) error {
+	_, err := db.Exec(`INSERT INTO demo_history (message, timestamp) VALUES (?, ?) `, name, time.Now())
+	if err != nil {
+		log.Printf("failed to insert mysql %v", err)
+		return err
+	}
+
+	return err
+}
 
 // SayHello implements helloworld.GreeterServer
 func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
@@ -35,6 +50,11 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 		region = "localhost"
 	} else {
 		region, _ = getRegionFromMetadata()
+	}
+
+	err := executeDB(s.db, in.Name)
+	if err != nil {
+		log.Printf("failed to execute DB %v", err)
 	}
 
 	return &pb.HelloReply{
@@ -76,6 +96,16 @@ func getRegionFromMetadata() (string, error) {
 	return region, nil
 }
 
+func initializedDb() (*sql.DB, error) {
+	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:3306)/demo")
+	if err != nil {
+		log.Printf("failed to open mysql %v", err)
+		return db, err
+	}
+
+	return db, err
+}
+
 func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	res, err := handler(ctx, req)
 	log.Printf("%s: %v -> %v", info.FullMethod, req, res)
@@ -83,7 +113,7 @@ func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySe
 }
 
 func main() {
-	log.Print("Hello gRPC Web Server...")
+	log.Printf("Hello gRPC Web Server...")
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -93,10 +123,20 @@ func main() {
 		grpc.UnaryInterceptor(loggingInterceptor),
 	)
 
-	pb.RegisterGreeterServer(s, &server{})
+	db, err := initializedDb()
+	if err != nil {
+		log.Printf("failed to initialize db: %v", err)
+	}
+
+	srv := &server{}
+	srv.db = db
+
+	pb.RegisterGreeterServer(s, srv)
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
+	db.Close()
 }
